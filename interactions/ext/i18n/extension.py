@@ -56,13 +56,16 @@ class Localization:
                 self._locales[key] = {}
             self._locales[key] |= _data
 
-    def _get_value(self, key: str) -> Optional[dict]:
+    def _get_value(self, key: str) -> Optional[Dict[Locale, str]]:
         return self.locales.get(key, MISSING)
 
-    def get_name(self, key: str) -> Optional[dict]:
+    def get(self, key: str) -> Optional[Dict[Locale, str]]:
+        return self.locales.get(key.upper())
+
+    def get_name(self, key: str) -> Optional[Dict[Locale, str]]:
         _key: str = f"{key.upper()}_NAME"
         return self._get_value(_key)
 
-    def get_description(self, key: str) -> Optional[dict]:
+    def get_description(self, key: str) -> Optional[Dict[Locale, str]]:
         _key: str = f"{key.upper()}_DESCRIPTION"
         return self._get_value(_key)
