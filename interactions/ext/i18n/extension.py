@@ -129,7 +129,7 @@ class Localization:
             return ctx.locale
 
         _locale = ctx._extras.get("locale")
-        return Locale(_locale)
+        return Locale(_locale) if _locale else None
 
     @staticmethod
     def get_guild_locale(ctx: _Context) -> Optional[Locale]:
@@ -143,4 +143,4 @@ class Localization:
             return ctx.guild_locale
 
         _guild_locale = ctx._extras.get("guild_locale")
-        return Locale(_guild_locale)
+        return Locale(_guild_locale) if _guild_locale else None
