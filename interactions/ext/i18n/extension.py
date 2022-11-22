@@ -79,6 +79,18 @@ class Localization:
         """
         return self.locales.get(key.upper())
 
+    def get_translate(self, locale: Locale, key: str) -> Optional[str]:
+        """
+        Gets a translation from locale code and key.
+
+        :param Locale locale: The locale code.
+        :param key: The key to get localization
+        :return: localized string, if any.
+        """
+
+        _localizations: Dict[Locale, str] = self.get(key)
+        return _localizations.get(locale) if _localizations else None
+
     def get_name(self, key: str) -> Optional[Dict[Locale, str]]:
         """
         Gets dict with localized names to command/option name.
