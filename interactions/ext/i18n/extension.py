@@ -5,6 +5,8 @@ from os import PathLike
 from pathlib import Path
 from typing import Dict, Optional
 
+from interactions.client.context import _Context
+
 from interactions import MISSING, Client, Locale
 
 __all__ = ("Localization",)
@@ -112,3 +114,33 @@ class Localization:
         _key: str = f"{key}_DESCRIPTION"
         value = self.get(_key)
         return value if value is not None else MISSING
+
+    # TODO: Remove these methods after 4.4.0 release
+
+    @staticmethod
+    def get_locale(ctx: _Context) -> Optional[Locale]:
+        """
+        Hack to get locale from ctx.
+
+        :param ctx:
+        :return:
+        """
+        if hasattr(ctx, "locale"):
+            return ctx.locale
+
+        _locale = ctx._extras.get("locale")
+        return Locale(_locale)
+
+    @staticmethod
+    def get_guild_locale(ctx: _Context) -> Optional[Locale]:
+        """
+        Hack to get guild locale from ctx.
+
+        :param ctx:
+        :return:
+        """
+        if hasattr(ctx, "guild_locale"):
+            return ctx.guild_locale
+
+        _guild_locale = ctx._extras.get("guild_locale")
+        return Locale(_guild_locale)
