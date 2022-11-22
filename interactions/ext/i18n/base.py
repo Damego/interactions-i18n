@@ -7,7 +7,7 @@ from .extension import Localization
 
 __all__ = ("version", "base", "setup")
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 version = Version(
     version=__version__, author=VersionAuthor(name="Damego", email="damego.dev@gmail.com")
