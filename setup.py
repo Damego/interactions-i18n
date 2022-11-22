@@ -6,7 +6,7 @@ from setuptools import setup
 # Package information
 AUTHOR = "Damego"
 AUTHOR_EMAIL = "damego.dev@gmail.com"
-DESCRIPTION = "Add a localizations to your interactions.py bot"
+DESCRIPTION = "Add localization support to your interactions.py bot"
 PROJECT_NAME = "interactions-i18n"
 MAIN_PACKAGE_NAME = "interactions.ext.i18n"
 URL = "https://github.com/Damego/interactions-i18n"

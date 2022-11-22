@@ -1,5 +1,5 @@
 # interactions-i18n
- Add a localizations to your interactions.py bot
+Add localization support to your interactions.py bot
 
 ## Installation
 
@@ -50,7 +50,7 @@ async def my_group(ctx: interactions.CommandContext):
 @interactions.option(key="info_member_opt")  # `key` is optional. Keys for this option you can get from option name
 async def user(ctx: interactions.CommandContext, member: interactions.Member):
     ...
-    # Keys for subcommand are `MEMBER_NAME` for name and `MEMBER_DESCRIPTION` for description
+    # Keys for subcommand are `USER_NAME` for name and `USER_DESCRIPTION` for description
     # Keys for option are `INFO_MEMBER_OPT_NAME` for name and `INFO_MEMBER_OPT_DESCRIPTION` for description
 ```
 

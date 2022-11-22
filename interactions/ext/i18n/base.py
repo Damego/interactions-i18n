@@ -16,7 +16,7 @@ base = Base(
     name="interactions-i18n",
     version=version,
     link="https://github.com/Damego/interactions-i18n",
-    description="Add localization support for your interactions.py bot",
+    description="Add localization support to your interactions.py bot",
     packages=["interactions.ext.i18n"],
     requirements=["discord-py-interactions>=4.3.2"],
 )
