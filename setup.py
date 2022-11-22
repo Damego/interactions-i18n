@@ -30,7 +30,7 @@ setup(
     long_description_content_type="text/markdown",
     url=URL,
     packages=["interactions.ext.i18n"],
-    python_requires=">=3.8",
+    python_requires=">=3.8.6",
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
