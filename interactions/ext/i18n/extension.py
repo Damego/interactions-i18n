@@ -10,6 +10,9 @@ __all__ = ("Localization",)
 
 log = getLogger("i18n")
 
+# TODO:
+#   Implement way to add/update json files
+
 
 class Localization:
     def __init__(self, client: Client):
