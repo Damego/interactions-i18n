@@ -9,11 +9,12 @@ Add localization support to your interactions.py bot
 
 ```py
 import interactions
+from interactions.ext.i18n import setup
 
 client = interactions.Client(...)
 
 # Load an i18n extension
-i18n = client.load("interactions.ext.i18n")
+i18n = setup(client)
 # Load a folder with locales
 # Also you can load json file only
 i18n.load("./locales/")
