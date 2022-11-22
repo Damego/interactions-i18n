@@ -84,7 +84,7 @@ class Localization:
         Gets a translation from locale code and key.
 
         :param Locale locale: The locale code.
-        :param key: The key to get localization
+        :param str key: The key to get localization
         :return: localized string, if any.
         """
 
