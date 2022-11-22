@@ -91,7 +91,7 @@ class Localization:
         _localizations: Dict[Locale, str] = self.get(key)
         return _localizations.get(locale) if _localizations else None
 
-    def get_name(self, key: str) -> Optional[Dict[Locale, str]]:
+    def _get_name(self, key: str) -> Optional[Dict[Locale, str]]:
         """
         Gets dict with localized names to command/option name.
 
@@ -102,7 +102,7 @@ class Localization:
         value = self.get(_key)
         return value if value is not None else MISSING
 
-    def get_description(self, key: str) -> Optional[Dict[Locale, str]]:
+    def _get_description(self, key: str) -> Optional[Dict[Locale, str]]:
         """
         Gets dict with localized description to command/option name.
 
