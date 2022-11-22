@@ -70,15 +70,6 @@ class Localization:
                 self._locales[key] = {}
             self._locales[key] |= _data
 
-    def _get_value(self, key: str) -> Optional[Dict[Locale, str]]:
-        """
-        Gets dict with localized value. Returns interactions.MISSING if not exists
-
-        :param str key: The key to get value.
-        :return: Dict with Locale as key and string as value
-        """
-        return self.locales.get(key, MISSING)
-
     def get(self, key: str) -> Optional[Dict[Locale, str]]:
         """
         Gets dict with localized value.
@@ -95,8 +86,9 @@ class Localization:
         :param str key: The key to get value.
         :return: Dict with Locale as key and string as value
         """
-        _key: str = f"{key.upper()}_NAME"
-        return self._get_value(_key)
+        _key: str = f"{key}_NAME"
+        value = self.get(_key)
+        return value if value is not None else MISSING
 
     def get_description(self, key: str) -> Optional[Dict[Locale, str]]:
         """
@@ -105,5 +97,6 @@ class Localization:
         :param str key: The key to get value.
         :return: Dict with Locale as key and string as value
         """
-        _key: str = f"{key.upper()}_DESCRIPTION"
-        return self._get_value(_key)
+        _key: str = f"{key}_DESCRIPTION"
+        value = self.get(_key)
+        return value if value is not None else MISSING
