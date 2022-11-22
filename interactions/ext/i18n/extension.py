@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
@@ -17,7 +18,7 @@ log = getLogger("i18n")
 class Localization:
     def __init__(self, client: Client):
         self.client: Client = client
-        self._locales: Dict[str, Dict[Locale, str]] = {}
+        self._locales: Dict[str, Dict[Locale, str]] = defaultdict(dict)
 
     @property
     def locales(self) -> Dict[str, Dict[Locale, str]]:
@@ -66,12 +67,8 @@ class Localization:
         Serializes dict to locale dict
         """
         locale = Locale(file.name.removesuffix(".json"))
-        for key in list(locale_data.keys()):
-            _data = {locale: locale_data.pop(key)}
-
-            if key not in self._locales:
-                self._locales[key] = {}
-            self._locales[key] |= _data
+        for key, value in locale_data.items():
+            self._locales[key] |= {locale: value}
 
     def get(self, key: str) -> Optional[Dict[Locale, str]]:
         """
