@@ -71,3 +71,17 @@ How will look our json file
   "INFO_MEMBER_OPT_DESCRIPTION": "..."
 }
 ```
+
+### Usage in Extension's
+
+```py
+from interactions import Extension
+from interactions.ext.i18n import Localization
+
+
+class MyExt(Extension):
+    def __init__(self, client):
+        self.client = client
+
+        self.i18n: Localization = self.client.i18n
+```
