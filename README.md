@@ -27,11 +27,27 @@ i18n.load("./locales/")
 client.start()
 ```
 
-## Creating a locale file
+### Usage in Extension
+
+Absolutely same as in the main file
+
+```py
+from interactions import Extension
+from interactions.ext.i18n import Localization
+
+
+class MyExt(Extension):
+    def __init__(self, client):
+        self.client = client
+
+        self.i18n: Localization = self.client.i18n
+```
+
+## Creating localization files
 
 1. Choose a language you want and find their code in the [Discord Locales Docs](https://discord.com/developers/docs/reference#locales)
 2. Create a `[CODE]` folder with found code and put it in the folder with locales.
-3. Create two files. First is `commands.json` for your commands and second is `custom.json` for your
+3. Create two files. First is `commands.json` for your commands and second is `custom.json` for anything you want
 
 ## Getting and setting keys
 
@@ -100,18 +116,22 @@ This file will contain your custom localizations for anything
 }
 ```
 
-### Usage in Extension
+## Auto generating file for commands
 
-Absolutely same as in the main file
+It seems a difficult to write every command in the json, so you can generate it for every command
 
-```py
-from interactions import Extension
-from interactions.ext.i18n import Localization
+```python
+from interactions import Client, Locale
+from interactions.ext.i18n import setup
 
+bot = Client(...)
+i18n = setup(bot)
+i18n.load("./locales/")
 
-class MyExt(Extension):
-    def __init__(self, client):
-        self.client = client
+...  # your cool commands
 
-        self.i18n: Localization = self.client.i18n
+# call this function in the end of main file
+i18n.generate_files(Locale.GERMAN, "./locales/")  # Second argument is optional. It needs if you want to generate files in different folder
+# bot.start()  # comment line where starts your bot
+
 ```
