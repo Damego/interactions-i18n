@@ -45,9 +45,15 @@ class JSONGenerator:
         folder = self._path / folder_name
         folder.mkdir(exist_ok=True)
 
+        _data = dumps(commands_data)
+        if isinstance(_data, bytes):
+            _data = _data.decode("utf-8")
         commands_file = folder / "commands.json"
-        commands_file.write_text(dumps(commands_data).decode("utf-8"))
+        commands_file.write_text(_data)
 
         if custom_data:
+            _custom_data = dumps(custom_data)
+            if isinstance(_custom_data, bytes):
+                _custom_data = _custom_data.decode("utf-8")
             custom_file = folder / "custom.json"
-            custom_file.write_text(dumps(custom_data).decode("utf-8"))
+            custom_file.write_text(_custom_data)
