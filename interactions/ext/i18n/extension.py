@@ -11,7 +11,7 @@ from typing import Dict, Optional, Union
 
 from interactions.client.context import _Context
 
-from interactions import Locale
+from interactions import Client, Locale
 
 from .models import CommandLocalization
 
@@ -21,7 +21,10 @@ log = getLogger("i18n")
 
 
 class Localization:
-    def __init__(self):
+    def __init__(self, client: Client, default_language: Optional[Locale] = None):
+        self.client: Client = client
+        self.default_language = default_language
+
         self._commands: Dict[str, CommandLocalization] = defaultdict(CommandLocalization)
         self._custom: Dict[str, Dict[Union[Locale, str], str]] = defaultdict(dict)
 
@@ -85,11 +88,11 @@ class Localization:
             return
 
         if locale is None:
-            return localized_value["default"]
+            return localized_value[self.default_language]
         try:
             return localized_value[locale]
         except KeyError:
-            return localized_value["default"]
+            return localized_value[self.default_language]
 
     def get_command_localization(self, command: str) -> Optional[CommandLocalization]:
         return self._commands.get(command)

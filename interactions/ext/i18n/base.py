@@ -1,7 +1,9 @@
+from typing import Optional
+
 from interactions.ext.base import Base
 from interactions.ext.version import Version, VersionAuthor
 
-from interactions import Client
+from interactions import Client, Locale
 
 from .extension import Localization
 from .ipy_overrides import override
@@ -23,7 +25,7 @@ base = Base(
 )
 
 
-def setup(client: Client):
+def setup(client: Client, default_language: Optional[Locale] = None):
     override()
-    client.i18n = Localization()
+    client.i18n = Localization(client, default_language)
     return client.i18n
