@@ -85,11 +85,16 @@ class Localization:
         Gets dict with localized value.
 
         :param str key: The key to get value.
-        :return: Dict with Locale as key and string as value
         """
         return self._custom.get(key.upper())
 
-    def get_translate(self, key: str, locale: Optional[Locale] = None):
+    def get_translate(self, key: str, locale: Optional[Locale] = None) -> Optional[str]:
+        """
+        Returns localized value for given key and locale.
+
+        :param str key: The key to lookup
+        :param Optional[Locale] locale: The language to lookup.
+        """
         localized_value = self.get(key.upper())
         if localized_value is None:
             return
@@ -103,6 +108,11 @@ class Localization:
             return localized_value.get(self.default_language)
 
     def get_command_localization(self, command: str) -> Optional[CommandLocalization]:
+        """
+        Returns localization data for command.
+
+        :param str command: The name of command.
+        """
         return self._commands.get(command)
 
     # TODO: Remove these methods after 4.4.0 release
@@ -112,13 +122,13 @@ class Localization:
         """
         Hack to get locale from ctx.
 
-        :param ctx:
-        :return:
+        :param _Context ctx: The context from command or component callback
+        :return: The user's selected language.
         """
         if hasattr(ctx, "locale"):
             return ctx.locale
 
-        _locale: str = ctx._extras.get("locale")
+        _locale: str = ctx._extras.get("locale")  # noqa
         return Locale(_locale) if _locale else None
 
     @staticmethod
@@ -126,11 +136,11 @@ class Localization:
         """
         Hack to get guild locale from ctx.
 
-        :param ctx:
-        :return:
+        :param _Context ctx: The context from command or component callback
+        :return: The guild's preferred language.
         """
         if hasattr(ctx, "guild_locale"):
             return ctx.guild_locale
 
-        _guild_locale: str = ctx._extras.get("guild_locale")
+        _guild_locale: str = ctx._extras.get("guild_locale")  # noqa
         return Locale(_guild_locale) if _guild_locale else None
