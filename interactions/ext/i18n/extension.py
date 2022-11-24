@@ -25,7 +25,7 @@ log = getLogger("i18n")
 
 class Localization:
     def __init__(self):
-        self._commands: Dict[str, CommandLocalization] = {}
+        self._commands: Dict[str, CommandLocalization] = defaultdict(CommandLocalization)
         self._custom: Dict[str, Dict[Union[Locale, str], str]] = defaultdict(dict)
 
     def load(self, path: PathLike):
@@ -56,10 +56,7 @@ class Localization:
         self._process_localization(locale, locale_data)
         if type == "commands":
             for command_name, command_data in locale_data.items():
-                if previous := self._commands.get(command_name):
-                    previous.add_localization(command_data)
-                else:
-                    self._commands[command_name] = CommandLocalization(**command_data)
+                self._commands[command_name].add_localization(command_data)
 
         elif type == "custom":
             for key, value in locale_data.items():
