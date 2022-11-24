@@ -13,14 +13,11 @@ from interactions.client.context import _Context
 
 from interactions import Locale
 
-from .localization import CommandLocalization
+from .models import CommandLocalization
 
 __all__ = ("Localization",)
 
 log = getLogger("i18n")
-
-# TODO:
-#   Implement way to add/update json files
 
 
 class Localization:
@@ -54,6 +51,7 @@ class Localization:
     def _add_localization(self, locale_name: str, type: str, locale_data: dict):
         locale = Locale(locale_name) if locale_name != "default" else "default"
         self._process_localization(locale, locale_data)
+
         if type == "commands":
             for command_name, command_data in locale_data.items():
                 self._commands[command_name].add_localization(command_data)

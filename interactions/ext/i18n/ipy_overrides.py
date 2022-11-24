@@ -5,7 +5,7 @@ from interactions.client.decor import command
 from interactions import MISSING, Command, Option
 
 from .extension import Localization
-from .localization import CommandLocalization, OptionLocalization
+from .models import CommandLocalization, OptionLocalization
 
 
 def _command(self: Command):
