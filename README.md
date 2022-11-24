@@ -118,7 +118,8 @@ This file will contain your custom localizations for anything
 
 ## Auto generating file for commands
 
-It seems a difficult to write every command in the json, so you can generate it for every command
+It seems difficult to write every command in the json, so you can generate file with your commands.
+You need to only fill empty strings with your language
 
 ```python
 from interactions import Client, Locale
