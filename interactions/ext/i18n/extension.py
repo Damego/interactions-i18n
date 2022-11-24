@@ -23,10 +23,12 @@ log = getLogger("i18n")
 class Localization:
     def __init__(self, client: Client, default_language: Optional[Locale] = None):
         self.client: Client = client
-        self.default_language = default_language
+        self.default_language: Locale = default_language
 
         self._commands: Dict[str, CommandLocalization] = defaultdict(CommandLocalization)
         self._custom: Dict[str, Dict[Union[Locale, str], str]] = defaultdict(dict)
+
+        self._path: Path = None
 
     def load(self, path: PathLike):
         """
@@ -34,16 +36,21 @@ class Localization:
 
         :param PathLike path: The path to file or to folder
         """
+        if self._path:
+            raise RuntimeError("You already loaded directory with localizations!")
+
         _path = Path(path)
 
         if not _path.is_dir():
-            raise ValueError("Should be a folder")  # TODO: !
+            raise ValueError("Path should be a directory")
+
+        self._path = _path
 
         for folder in _path.iterdir():
             for file in folder.iterdir():
                 file_name = file.name.removesuffix(".json")
                 if file_name not in {"commands", "custom"}:
-                    continue  # TODO: raise an error
+                    continue
 
                 locale_data = loads(file.read_text("utf-8"))
                 if not locale_data:
@@ -51,7 +58,7 @@ class Localization:
 
                 self._add_localization(folder.name, file_name, locale_data)
 
-    def _add_localization(self, locale_name: str, type: str, locale_data: dict):
+    def _add_localization(self, locale_name: str, type: str, locale_data: dict):  # noqa
         locale = Locale(locale_name) if locale_name != "default" else "default"
         self._process_localization(locale, locale_data)
 
@@ -88,11 +95,12 @@ class Localization:
             return
 
         if locale is None:
-            return localized_value[self.default_language]
+            return localized_value.get(self.default_language)
+
         try:
             return localized_value[locale]
         except KeyError:
-            return localized_value[self.default_language]
+            return localized_value.get(self.default_language)
 
     def get_command_localization(self, command: str) -> Optional[CommandLocalization]:
         return self._commands.get(command)

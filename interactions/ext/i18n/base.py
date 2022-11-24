@@ -9,7 +9,6 @@ from .extension import Localization
 from .ipy_overrides import override
 
 __all__ = ("version", "base", "setup")
-
 __version__ = "0.0.2"
 
 version = Version(
