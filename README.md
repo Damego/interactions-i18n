@@ -8,7 +8,6 @@ Add localization support to your interactions.py bot
 3. `pip install --upgrade interactions-i18n`
 
 
-
 ## Usage
 
 ```py
