@@ -116,7 +116,7 @@ This file will contain your custom localizations for anything
 }
 ```
 
-## Auto generating file for commands
+## Automatic file generation
 
 It seems difficult to write every command in the json, so you can generate file with your commands.
 You need to only fill empty strings with your language
