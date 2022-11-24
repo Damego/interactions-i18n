@@ -18,52 +18,45 @@ class BaseLocalization(DictSerializerMixin):
         if self.options is not MISSING:
             self.options = {key: OptionLocalization(**value) for key, value in self.options.items()}
 
+    def add_localization(self, data: dict):
+        if options := data.pop("options", None):
+            if self.options is MISSING:
+                self.options = {}
+
+            for opt_name, opt_value in options.items():
+                if option := self.options.get(opt_name):
+                    option.add_localization(opt_value)
+                else:
+                    self.options[opt_name] = OptionLocalization(**opt_value)
+
+        for key, value in data.items():
+            _current = getattr(self, key)
+            if _current is MISSING:
+                setattr(self, key, value)
+            else:
+                _current |= value
+
 
 @define()
 class OptionLocalization(BaseLocalization):
     choices: Dict[str, Dict[Locale, str]] = field(default=MISSING)
 
     def add_localization(self, data: dict):
-        for key, value in data.items():
-            if key == "options":
-                if self.options is MISSING:
-                    self.options = {}
-                for opt_name, opt_value in value.items():
-                    if option := self.options.get(opt_name):
-                        option.add_localization(opt_value)
-                    else:
-                        self.options[opt_name] = OptionLocalization(**opt_value)
-            elif key == "choices":
-                if self.choices is MISSING:
-                    self.choices = {}
-                for choice_name, choice_value in value.items():
-                    if choice := self.choices.get(choice_name):
-                        choice |= choice_value
-                    else:
-                        self.choices[choice_name] = choice_value
+        super().add_localization(data)
+
+        if not (choices := data.get("choices")):
+            return
+
+        if self.choices is MISSING:
+            self.choices = {}
+
+        for choice_name, choice_value in choices.items():
+            if choice := self.choices.get(choice_name):
+                choice |= choice_value
             else:
-                _current = getattr(self, key)
-                if _current is MISSING:
-                    setattr(self, key, value)
-                else:
-                    _current |= value
+                self.choices[choice_name] = choice_value
 
 
 @define()
 class CommandLocalization(BaseLocalization):
-    def add_localization(self, data: dict):
-        for key, value in data.items():
-            if key == "options":
-                if self.options is MISSING:
-                    self.options = {}
-                for opt_name, opt_value in value.items():
-                    if option := self.options.get(opt_name):
-                        option.add_localization(opt_value)
-                    else:
-                        self.options[opt_name] = OptionLocalization(**opt_value)
-            else:
-                _current = getattr(self, key)
-                if _current is MISSING:
-                    setattr(self, key, value)
-                else:
-                    _current |= value
+    ...  # bruh
