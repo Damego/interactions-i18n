@@ -13,6 +13,7 @@ from interactions.client.context import _Context
 
 from interactions import Client, Locale
 
+from .json_generator import JSONGenerator
 from .models import CommandLocalization
 
 __all__ = ("Localization",)
@@ -144,3 +145,16 @@ class Localization:
 
         _guild_locale: str = ctx._extras.get("guild_locale")  # noqa
         return Locale(_guild_locale) if _guild_locale else None
+
+    def generate_files(self, locale: Locale, path: Optional[str] = None):
+        """
+        Generates files with empty string values for localization
+
+        :param locale: The language
+        :param path: The path to create files
+        """
+        JSONGenerator(
+            path or self._path, self.client._commands, list(self._custom.keys())
+        ).generate(
+            locale
+        )  # noqa
