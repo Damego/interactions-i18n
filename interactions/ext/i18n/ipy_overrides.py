@@ -1,49 +1,14 @@
-from typing import Awaitable, Callable, List, Optional, Union
+from typing import List, Union
 
 from interactions.client.decor import command
-from interactions.utils.attrs_utils import define, field
 
-import interactions
-from interactions import MISSING, Command
-from interactions import option as _option
+from interactions import MISSING, Command, Option
 
 from .extension import Localization
+from .localization import CommandLocalization, OptionLocalization
 
 
-def add_option_localizations(i18n: Localization, __option: interactions.Option):
-    key = __option.name
-    if locale_key := getattr(__option, "locale_key", None):
-        key = locale_key
-
-    _name = i18n._get_name(key)
-    _description = i18n._get_description(key)
-
-    if _name:
-        __option.name_localizations = _name
-        __option._json["name_localizations"] = _name  # TODO: Remove this after asdict pr
-    if _description:
-        __option.description_localizations = _description
-        __option._json[
-            "description_localizations"
-        ] = _description  # TODO: Remove this after asdict pr
-
-
-@property
-def full_data(self) -> Union[dict, List[dict]]:
-    i18n: Localization = self.client.i18n  # type: ignore
-
-    self.name_localizations = i18n._get_name(self.name)
-    self.description_localizations = i18n._get_description(self.name)
-
-    for option in self.options:
-        add_option_localizations(i18n, option)
-        if option.options:
-            for _option in option.options:  # noqa: F402
-                add_option_localizations(i18n, _option)
-                if _option.options:
-                    for __option in _option.options:
-                        add_option_localizations(i18n, __option)
-
+def _command(self: Command):
     return command(
         type=self.type,
         name=self.name,
@@ -57,32 +22,39 @@ def full_data(self) -> Union[dict, List[dict]]:
     )
 
 
-setattr(Command, "full_data", full_data)
+def add_option_localization(
+    options: List[Option], localization: Union[CommandLocalization, OptionLocalization]
+):
+    for option in options:
+        if not (option_localization := localization.options.get(option.name)):
+            continue
+        option.name_localizations = option_localization.name
+        option.description_localizations = option_localization.description
+
+        if option.choices:
+            for choice in option.choices:
+                if choice_localization := localization.choices.get(choice.name):
+                    choice.name_localizations = choice_localization
+
+        if option.options:
+            add_option_localization(option.options, localization.options[option.name])
 
 
-@define()
-class Option(interactions.Option):
-    locale_key: Optional[str] = field(default=None)
+def override():
+    @property
+    def full_data(self: Command) -> Union[dict, List[dict]]:
+        i18n: Localization = self.client.i18n  # type: ignore
+        command_localization: CommandLocalization = i18n.get_command_localization(self.name)
 
+        if command_localization is None:
+            return _command(self)
 
-def option(
-    description: str = "No description set",
-    /,
-    *,
-    key: Optional[str] = None,
-    **kwargs,
-) -> Callable[[Callable[..., Awaitable]], Callable[..., Awaitable]]:
-    def wrapper(coro: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
-        _coro = _option(description, **kwargs)(coro)
+        self.name_localizations = command_localization.name
+        self.description_localizations = command_localization.description
 
-        # I'm getting AttributeError when trying to set attribute
-        __option = Option(**_coro._options[0]._json)
-        __option.locale_key = key
-        _coro._options[0] = __option
+        if self.options:
+            add_option_localization(self.options, command_localization)
 
-        return _coro
+        return _command(self)
 
-    return wrapper
-
-
-interactions.option = option
+    setattr(Command, "full_data", full_data)
