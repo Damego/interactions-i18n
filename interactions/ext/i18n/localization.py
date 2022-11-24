@@ -39,7 +39,7 @@ class BaseLocalization(DictSerializerMixin):
 
 @define()
 class OptionLocalization(BaseLocalization):
-    choices: Dict[str, Dict[Locale, str]] = field(default=MISSING)
+    choices: Optional[Dict[str, Dict[Locale, str]]] = field(default=MISSING)
 
     def add_localization(self, data: dict):
         super().add_localization(data)
