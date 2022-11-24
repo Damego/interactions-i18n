@@ -3,7 +3,11 @@ Add localization support to your interactions.py bot
 
 ## Installation
 
-`pip install --upgrade interactions-i18n`
+1. `pip uninstall discord-py-interactions`
+2. `pip install git+https://github.com/interactions-py/library.git@unstable`
+3. `pip install --upgrade interactions-i18n`
+
+
 
 ## Usage
 
@@ -19,7 +23,7 @@ i18n = setup(client)
 # Also you can load json file only
 i18n.load("./locales/")
 
-...
+...  # your cool commands
 
 client.start()
 ```
@@ -27,7 +31,8 @@ client.start()
 ## Creating a locale file
 
 1. Choose a language you want and find their code in the [Discord Locales Docs](https://discord.com/developers/docs/reference#locales)
-2. Create a `[CODE].json` file with found code in the folder with locales.
+2. Create a `[CODE]` folder with found code and put it in the folder with locales.
+3. Create two files. First is `commands.json` for your commands and second is `custom.json` for your
 
 ## Getting and setting keys
 
@@ -37,42 +42,68 @@ Let's create a command with name `info` with some subcommands
 @client.command()
 async def info(ctx: interactions.CommandContext):
     ...
-    # Key for command name will be `INFO_NAME`
-    # Key for command description will be `INFO_DESCRIPTION`
-
 
 @info.group()
 async def my_group(ctx: interactions.CommandContext):
     ...
-    # Keys are `MY_GROUP_NAME` for name and `MY_GROUP_DESCRIPTION` for description
-
 
 @my_group.subcommand()
-@interactions.option(key="info_member_opt")  # `key` is optional. Keys for this option you can get from option name
+@interactions.option()
 async def user(ctx: interactions.CommandContext, member: interactions.Member):
-    ...
-    # Keys for subcommand are `USER_NAME` for name and `USER_DESCRIPTION` for description
-    # Keys for option are `INFO_MEMBER_OPT_NAME` for name and `INFO_MEMBER_OPT_DESCRIPTION` for description
+    loc = i18n.get_translate("some_key", ctx.locale)
+    await ctx.send(loc)
 ```
 
-How will look our json file
+## Structure of json files
 
-`locales/de.json`
+`locales/de/commands.json`
+
+This file will contain localizations for your commands
 
 ```json
 {
-  "INFO_NAME": "...",
-  "INFO_DESCRIPTION": "...",
-  "MY_GROUP_NAME": "...",
-  "MY_GROUP_DESCRIPTION": "...",
-  "MEMBER_NAME": "...",
-  "MEMBER_DESCRIPTION": "...",
-  "INFO_MEMBER_OPT_NAME": "...",
-  "INFO_MEMBER_OPT_DESCRIPTION": "..."
+    "info": { // command name
+        "name": "...", // localized name
+        "description": "...", // localized description
+        "options": { // options of command. Command groups and subcommands are options btw
+            "my_group": {
+                "name": "...",
+                "description": "...",
+                "options": {
+                    "user": {
+                        "name": "...",
+                        "description": "...",
+                        "options": {
+                            "member": {
+                                "name": "...",
+                                "description": "...",
+                                // if your option have choices you can do:
+                                "choices": {
+                                    "choice_name": "..."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 ```
 
-### Usage in Extension's
+`locales/de/custom.json`
+
+This file will contain your custom localizations for anything
+
+```json
+{
+  "SOME_KEY": "Some value"
+}
+```
+
+### Usage in Extension
+
+Absolutely same as in the main file
 
 ```py
 from interactions import Extension
