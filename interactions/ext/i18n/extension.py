@@ -7,14 +7,14 @@ from collections import defaultdict
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from interactions.client.context import _Context
 
-from interactions import Client, Locale
+from interactions import Client, Locale, Option
 
 from .json_generator import JSONGenerator
-from .models import CommandLocalization
+from .models import CommandLocalization, OptionLocalization
 
 __all__ = ("Localization",)
 
@@ -37,6 +37,7 @@ class Localization:
 
         :param PathLike path: The path to file or to folder
         """
+
         if self._path:
             raise RuntimeError("You already loaded directory with localizations!")
 
@@ -63,7 +64,7 @@ class Localization:
         locale = Locale(locale_name) if locale_name != "default" else "default"
         self._process_localization(locale, locale_data)
 
-        if type == "commands":
+        if type == "commands" and locale != "default":
             for command_name, command_data in locale_data.items():
                 self._commands[command_name].add_localization(command_data)
 
@@ -80,6 +81,36 @@ class Localization:
                 self._process_localization(locale, value)
             else:
                 locale_data[key] = {locale: value}
+
+    def __add_option_localization(
+        self, options: List[Option], localization: Union[CommandLocalization, OptionLocalization]
+    ):
+        for option in options:
+            if not (option_localization := localization.options.get(option.name)):
+                continue
+            option.name_localizations = option_localization.name
+            option.description_localizations = option_localization.description
+
+            if option.choices:
+                for choice in option.choices:
+                    if choice_localization := localization.choices.get(choice.name):
+                        choice.name_localizations = choice_localization
+
+            if option.options:
+                self.__add_option_localization(option.options, option_localization)
+
+    def __add_localizations(self):
+        for command in self.client._commands:  # noqa
+            command_localization = self._commands.get(command.name)
+
+            if command_localization is None:
+                continue
+
+            command.name_localizations = command_localization.name
+            command.description_localizations = command_localization.description
+
+            if command.options:
+                self.__add_option_localization(command.options, command_localization)
 
     def get(self, key: str) -> Optional[Dict[Union[Locale, str], str]]:
         """
