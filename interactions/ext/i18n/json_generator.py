@@ -16,14 +16,13 @@ class JSONGenerator:
         self._commands: List[Command] = commands
         self._custom: List[str] = custom
 
-    def _get_json(self, command_or_option: Union[Command, Option]) -> dict:
-        json = {
-            "name": "",
-            "description": "",
-        }
+    def _generate_json(self, locale: Locale, command_or_option: Union[Command, Option]) -> dict:
+        json = {"name": "", "description": ""}
+
         if command_or_option.options:
             json["options"] = {
-                option.name: self._get_json(option) for option in command_or_option.options
+                option.name: self._generate_json(locale, option)
+                for option in command_or_option.options
             }
         if isinstance(command_or_option, Option) and command_or_option.choices:
             json["choices"] = {choice.name: "" for choice in command_or_option.choices}
@@ -35,7 +34,7 @@ class JSONGenerator:
 
         for command in self._commands:
             print(f"Generating `{command.name}`...")
-            commands_data[command.name] = self._get_json(command)
+            commands_data[command.name] = self._generate_json(locale, command)
 
         custom_data = {key: "" for key in self._custom}
 
@@ -45,15 +44,16 @@ class JSONGenerator:
         folder = self._path / folder_name
         folder.mkdir(exist_ok=True)
 
-        _data = dumps(commands_data)
-        if isinstance(_data, bytes):
-            _data = _data.decode("utf-8")
-        commands_file = folder / "commands.json"
-        commands_file.write_text(_data)
+        self._write_file(folder, "commands.json", commands_data)
 
         if custom_data:
-            _custom_data = dumps(custom_data)
-            if isinstance(_custom_data, bytes):
-                _custom_data = _custom_data.decode("utf-8")
-            custom_file = folder / "custom.json"
-            custom_file.write_text(_custom_data)
+            self._write_file(folder, "custom.json", custom_data)
+
+    @staticmethod
+    def _write_file(folder: Path, filename: str, data: dict):
+        _data = dumps(data)
+        if isinstance(_data, bytes):
+            _data = _data.decode("utf-8")
+
+        custom_file = folder / filename
+        custom_file.write_text(_data)
