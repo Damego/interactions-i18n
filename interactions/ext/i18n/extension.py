@@ -7,7 +7,7 @@ from collections import defaultdict
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from interactions.client.context import _Context
 
@@ -15,6 +15,7 @@ from interactions import Client, Locale
 
 from .json_generator import JSONGenerator
 from .models import CommandLocalization
+from .utils import add_command_localizations
 
 __all__ = ("Localization",)
 
@@ -26,39 +27,41 @@ class Localization:
         self.client: Client = client
         self.default_language: Locale = default_language
 
-        self._commands: Dict[str, CommandLocalization] = defaultdict(CommandLocalization)
-        self._custom: Dict[str, Dict[Union[Locale, str], str]] = defaultdict(dict)
+        self._commands_localizations: Dict[str, CommandLocalization] = defaultdict(
+            CommandLocalization
+        )
+        self._custom_localizations: Dict[str, Dict[Union[Locale, str], str]] = defaultdict(dict)
 
-        self._path: Path = None
+        self._paths: List[Path] = []
 
-    def load(self, path: PathLike):
+    def load(self, path: Union[PathLike, str]):
         """
-        Loads file/files with localization
+        Loads folder with localization
 
-        :param PathLike path: The path to file or to folder
+        :param Union[PathLike, str] path: The path to the folder with localization
         """
+        self._load_file(Path(path))
+        print(self._commands_localizations)
+        add_command_localizations(self.client._commands, self._commands_localizations)
 
-        if self._path:
-            raise RuntimeError("You already loaded directory with localizations!")
-
-        _path = Path(path)
-
-        if not _path.is_dir():
+    def _load_file(self, path: Path):
+        if not path.is_dir():
             raise ValueError("Path should be a directory")
+        if path.name in [_.name for _ in self._paths]:
+            raise RuntimeError("You already loaded directory with this localization!")
 
-        self._path = _path
+        for file in path.iterdir():
+            file_name = file.name.removesuffix(".json")
+            if file_name not in {"commands", "custom"}:
+                continue
 
-        for folder in _path.iterdir():
-            for file in folder.iterdir():
-                file_name = file.name.removesuffix(".json")
-                if file_name not in {"commands", "custom"}:
-                    continue
+            locale_data = loads(file.read_text("utf-8"))
+            if not locale_data:
+                continue
 
-                locale_data = loads(file.read_text("utf-8"))
-                if not locale_data:
-                    continue
+            self._add_localization(path.name, file_name, locale_data)
 
-                self._add_localization(folder.name, file_name, locale_data)
+        self._paths.append(path)
 
     def _add_localization(self, locale_name: str, type: str, locale_data: dict):  # noqa
         locale = Locale(locale_name) if locale_name != "default" else "default"
@@ -66,20 +69,20 @@ class Localization:
 
         if type == "commands" and locale != "default":
             for command_name, command_data in locale_data.items():
-                self._commands[command_name].add_localization(command_data)
+                self._commands_localizations[command_name].add_localization(command_data)
 
         elif type == "custom":
             for key, value in locale_data.items():
-                if previous := self._custom.get(key):
+                if previous := self._custom_localizations.get(key):
                     previous |= value
                 else:
-                    self._custom[key] = value
+                    self._custom_localizations[key] = value
 
     def _process_localization(self, locale: Union[Locale, str], locale_data: dict):
         for key, value in locale_data.items():
             if isinstance(value, dict):
                 self._process_localization(locale, value)
-            else:
+            elif value:
                 locale_data[key] = {locale: value}
 
     def get(self, key: str) -> Optional[Dict[Union[Locale, str], str]]:
@@ -88,7 +91,7 @@ class Localization:
 
         :param str key: The key to get value.
         """
-        return self._custom.get(key.upper())
+        return self._custom_localizations.get(key.upper())
 
     def get_translate(self, key: str, locale: Optional[Locale] = None) -> Optional[str]:
         """
@@ -115,7 +118,7 @@ class Localization:
 
         :param str command: The name of command.
         """
-        return self._commands.get(command)
+        return self._commands_localizations.get(command)
 
     # TODO: Remove these methods after 4.4.0 release
 
@@ -147,7 +150,7 @@ class Localization:
         _guild_locale: str = ctx._extras.get("guild_locale")  # noqa
         return Locale(_guild_locale) if _guild_locale else None
 
-    def generate_files(self, locale: Locale, path: Optional[str] = None):
+    def generate_files(self, locale: Locale, path: Path):
         """
         Generates files with empty string values for localization
 
@@ -155,7 +158,7 @@ class Localization:
         :param path: The path to create files
         """
         JSONGenerator(
-            path or self._path, self.client._commands, list(self._custom.keys())
+            path, self.client._commands, list(self._custom_localizations.keys())
         ).generate(
             locale
         )  # noqa
