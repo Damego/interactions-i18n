@@ -6,7 +6,6 @@ from interactions.ext.version import Version, VersionAuthor
 from interactions import Client, Locale
 
 from .extension import Localization
-from .ipy_overrides import override
 
 __all__ = ("version", "base", "setup")
 __version__ = "0.0.2"
@@ -25,6 +24,5 @@ base = Base(
 
 
 def setup(client: Client, default_language: Optional[Locale] = None):
-    override()
     client.i18n = Localization(client, default_language)
     return client.i18n
