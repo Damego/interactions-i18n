@@ -8,7 +8,7 @@ from interactions import Client, Locale
 from .extension import Localization
 
 __all__ = ("version", "base", "setup")
-__version__ = "0.0.2"
+__version__ = "1.0.0"
 
 version = Version(
     version=__version__, author=VersionAuthor(name="Damego", email="damego.dev@gmail.com")
