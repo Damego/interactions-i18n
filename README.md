@@ -18,18 +18,15 @@ client = interactions.Client(...)
 
 # Load an i18n extension
 i18n = setup(client)
-# Load a folder with locales
-# Also you can load json file only
-i18n.load("./locales/")
 
-...  # your cool commands
+...  # your cool commands and cogs loads
 
+# Load a folder with localization
+i18n.load("./locales/de")
 client.start()
 ```
 
 ### Usage in Extension
-
-Absolutely same as in the main file
 
 ```py
 from interactions import Extension
@@ -49,7 +46,7 @@ class MyExt(Extension):
 2. Create a `[CODE]` folder with found code and put it in the folder with locales.
 3. Create two files. First is `commands.json` for your commands and second is `custom.json` for anything you want
 
-## Getting and setting keys
+## Example
 
 Let's create a command with name `info` with some subcommands
 
@@ -69,7 +66,7 @@ async def user(ctx: interactions.CommandContext, member: interactions.Member):
     await ctx.send(loc)
 ```
 
-## Structure of json files
+### Structure of json files
 
 `locales/de/commands.json`
 
@@ -127,12 +124,12 @@ from interactions.ext.i18n import setup
 
 bot = Client(...)
 i18n = setup(bot)
-i18n.load("./locales/")
+# i18n.load("./locales/de")
 
 ...  # your cool commands
 
 # call this function in the end of main file
-i18n.generate_files(Locale.GERMAN, "./locales/")  # Second argument is optional. It needs if you want to generate files in different folder
+i18n.generate_files(Locale.GERMAN, "./locales/")
 # bot.start()  # comment line where starts your bot
 
 ```
