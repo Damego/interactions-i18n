@@ -4,7 +4,7 @@ Add localization support to your interactions.py bot
 ## Installation
 
 1. `pip uninstall discord-py-interactions`
-2. `pip install git+https://github.com/interactions-py/library.git@unstable`
+2. `pip install git+https://github.com/interactions-py/library.git@4.4.0-beta.1`
 3. `pip install --upgrade interactions-i18n`
 
 
